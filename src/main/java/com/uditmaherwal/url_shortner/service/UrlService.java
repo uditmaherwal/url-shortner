@@ -1,6 +1,8 @@
 package com.uditmaherwal.url_shortner.service;
 
+import com.mongodb.internal.client.model.FindOptions;
 import com.uditmaherwal.url_shortner.model.Counter;
+import com.uditmaherwal.url_shortner.model.UrlMapping;
 import com.uditmaherwal.url_shortner.repository.UrlMappingRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +11,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.net.http.HttpClient;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Service
@@ -33,8 +38,14 @@ public class UrlService {
                         new Update().inc("lastId", 1000),
                         FindAndModifyOptions.options().returnNew(true),
                         Counter.class);
-        assert counter != null;
-        return counter.getLastId();
+        if (counter != null) {
+            return counter.getLastId();
+        }
+        Counter newCounter = new Counter();
+        newCounter.setId("url_counter");
+        newCounter.setLastId(10000000);
+        mongoTemplate.save(newCounter);
+        return newCounter.getLastId();
     }
 
     private void refillQueue(long id){
@@ -58,7 +69,7 @@ public class UrlService {
         return shortUrl.reverse().toString();
     }
 
-    private void getShortUrl(String originalUrl){
+    public String getShortUrl(String originalUrl){
         if(keyQueue.isEmpty()){
             synchronized (this){
                 if(keyQueue.isEmpty()){
@@ -69,5 +80,28 @@ public class UrlService {
         }
 
         String shortUrl = keyQueue.poll();
+        UrlMapping mapping = new UrlMapping();
+        mapping.setOriginalUrl(originalUrl);
+        mapping.setShortKey(shortUrl);
+        urlMappingRepository.save(mapping);
+        return shortUrl;
+    }
+
+    @Async
+    public void incrementClickCount(String shortKey){
+        mongoTemplate.updateFirst(
+                new Query(Criteria.where("shortKey").is(shortKey)),
+                new Update().inc("clickCount", 1),
+                UrlMapping.class
+        );
+    }
+
+    public String redirect(String shortKey){
+        UrlMapping mapping = mongoTemplate.findOne(new Query(Criteria.where("shortKey").is(shortKey)),  UrlMapping.class);
+        if(mapping == null){
+            return "";
+        }
+        incrementClickCount(shortKey);
+        return mapping.getOriginalUrl();
     }
 }

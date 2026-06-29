@@ -13,5 +13,7 @@ public class UrlMapping {
     @Id
     private String shortKey;
     private String originalUrl;
+    private Integer clickCount;
     private LocalDateTime createdAt;
+
 }
