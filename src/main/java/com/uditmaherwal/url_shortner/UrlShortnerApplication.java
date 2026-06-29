@@ -1,13 +1,13 @@
-package com.uditmaherwal.url_shorter;
+package com.uditmaherwal.url_shortner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UrlShorterApplication {
+public class UrlShortnerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(UrlShorterApplication.class, args);
+		SpringApplication.run(UrlShortnerApplication.class, args);
 	}
 
 }

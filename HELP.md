@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.uditmaherwal.url-shorter' is invalid and this project uses 'com.uditmaherwal.url_shorter' instead.
+* The original package name 'com.uditmaherwal.url-shorter' is invalid and this project uses 'com.uditmaherwal.url_shortner' instead.
 
 # Getting Started
 
