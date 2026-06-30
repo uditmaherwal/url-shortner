@@ -1,6 +1,5 @@
 package com.uditmaherwal.url_shortner.service;
 
-import com.mongodb.internal.client.model.FindOptions;
 import com.uditmaherwal.url_shortner.model.Counter;
 import com.uditmaherwal.url_shortner.model.UrlMapping;
 import com.uditmaherwal.url_shortner.repository.UrlMappingRepository;
@@ -13,9 +12,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.net.http.HttpClient;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Service
